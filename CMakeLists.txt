@@ -3,7 +3,7 @@ option(ULOG_ENABLE_DATE "Enable date in log timestamp" OFF)
 option(ULOG_ENABLE_MILLISECOND "Enable millisecond in log timestamp" ON)
 option(ULOG_ENABLE_COLOR "Enable terminal color in log" ON)
 option(ULOG_ENABLE_ADDRESS "Enable file name and line number in log" ON)
-# option(ULOG_ENABLE_FUNCTION "Enable function name in log" OFF)
+option(ULOG_ENABLE_FUNCTION "Enable function name in log" OFF)
 
 
 if (NOT ULOG_ENABLE_TIMESTAMP)
@@ -20,6 +20,9 @@ if (NOT ULOG_ENABLE_COLOR)
 endif()
 if (NOT ULOG_ENABLE_ADDRESS)
     add_definitions(-DULOG_DISABLE_ADDR)
+endif()
+if (NOT ULOG_ENABLE_FUNCTION)
+    add_definitions(-DULOG_DISABLE_FUNC)
 endif()
 
 add_library(ulog ulog.c ulog.h)

@@ -32,7 +32,11 @@ extern "C" {
 # ifndef ULOG_DISABLE_DATE
 #  define ULOG_ENABLE_DATE 1
 # endif
+#endif
 
+// enable function name by default
+#ifndef ULOG_DISABLE_FUNC
+# define ULOG_ENABLE_FUNC 1
 #endif
 
 // log tags
@@ -51,17 +55,24 @@ extern "C" {
 #define ULOG_LV_TRACE   (ULOG_TAG_TRACE | ULOG_LV_DEBUG)
 #define ULOG_LV_ALL     (ULOG_LV_TRACE)
 
-
+// print function
+// tag: log tag
+// line: log message line with newline
 typedef int (*print_func)(void* userdata, int tag, const char* line);
 
 
-//
+// init ulog, user can use default if not call this.
+// func: user defined print function, if NULL, using default
+// userdata: userdata pointer pass to print function
+// filter: tag filter allow what tag log would be print
 void ulog_init(print_func func, void *userdata, int filter);
 
 
-//
+// ulog log process function
 void ulog_log(int tag, const char *file, int lineno, const char *func, const char *format, ...);
 
+
+// log macros, use these macros to print log
 #define	LOG_TRACE(...)  ulog_log(ULOG_TAG_TRACE, __FILE__, __LINE__, __func__, __VA_ARGS__)
 #define	LOG_DEBUG(...)  ulog_log(ULOG_TAG_DEBUG, __FILE__, __LINE__, __func__, __VA_ARGS__)
 #define	LOG_INFO(...)   ulog_log(ULOG_TAG_INFO,  __FILE__, __LINE__, __func__, __VA_ARGS__)

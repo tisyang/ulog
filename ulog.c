@@ -35,6 +35,7 @@ static const char* const TAG_COLORS[] = {
     [ULOG_TAG_ERROR]     = "\x1b[31m",
 };
 #define COLOR_ADDR  "\x1b[90m"
+#define COLOR_FUNC  COLOR_ADDR
 #define COLOR_RESET "\x1b[0m"
 
 
@@ -58,6 +59,7 @@ void ulog_log(int tag, const char *file, int lineno, const char *func, const cha
 
     int idx = 0;
     char line[ULOG_LINE_MAXCHAR];
+    // prcess timestamp, tag name, address, function
 #if ULOG_ENABLE_TIME
 # if ULOG_ENABLE_DATE
     idx += strftime(line + idx, sizeof(line) - idx, "%F %T", tminfo);
@@ -71,23 +73,36 @@ void ulog_log(int tag, const char *file, int lineno, const char *func, const cha
 
     idx += snprintf(line + idx, sizeof(line) - idx,
 #if ULOG_ENABLE_COLOR
-# if ULOG_ENABLE_ADDR
-                    " %s%s %s%s:%d%s: ",
-                    TAG_COLORS[tag], TAG_NAMES[tag],
-                    COLOR_ADDR, file, lineno, COLOR_RESET);
-# else
-                    " %s%s%s: ",
-                    TAG_COLORS[tag], TAG_NAMES[tag], COLOR_RESET);
-# endif
+                    " %s%s", TAG_COLORS[tag], TAG_NAMES[tag]);
 #else
-# if ULOG_ENABLE_ADDR
-                    " %s %s:%d: ",
-                    TAG_NAMES[loglevel], file, lineno);
+                    " %s", TAG_NAMES[tag]);
+#endif
+
+#if ULOG_ENABLE_ADDR
+    idx += snprintf(line + idx, sizeof(line) - idx,
+# if ULOG_ENABLE_COLOR
+                    " %s%s:%d", COLOR_ADDR, file, lineno);
 # else
-                    " %s: ",
-                    TAG_NAMES[loglevel]);
+                    " %s:%d", file, lineno);
 # endif
 #endif
+
+#if ULOG_ENABLE_FUNC
+    idx += snprintf(line + idx, sizeof(line) - idx,
+# if ULOG_ENABLE_COLOR
+                    " %s%s", COLOR_FUNC, func);
+# else
+                    " %s", func);
+# endif
+#endif
+
+    idx += snprintf(line + idx, sizeof(line) - idx,
+#if ULOG_ENABLE_COLOR
+                    "%s: ", COLOR_RESET);
+#else
+                    ": ");
+#endif
+
     va_list arglist;
     va_start(arglist, format);
     idx += vsnprintf(line + idx, sizeof(line) - idx, format, arglist);
