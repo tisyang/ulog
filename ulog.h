@@ -68,6 +68,13 @@ typedef int (*print_func)(void* userdata, int tag, const char* line);
 void ulog_init(print_func func, void *userdata, int filter);
 
 
+// init ulog with default configuration.
+// will log to stdout and a log file in current work directory.
+// app: argv[0] program name, using for log file name. 'app.log.date_time'
+// using filter if ENV var ULOG_LEVEL set Trace/Debug/Info/Warn/Error.
+void ulog_init_default(const char *app);
+
+
 // ulog log process function
 void ulog_log(int tag, const char *file, int lineno, const char *func, const char *format, ...);
 
