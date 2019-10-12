@@ -1,6 +1,10 @@
 #ifndef ULOG_H
 #define ULOG_H
 
+// tiny c log library for debugging
+// author by TyK
+// Github: https://github.com/lazytinker/ulog
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -66,13 +70,6 @@ typedef int (*print_func)(void* userdata, int tag, const char* line);
 // userdata: userdata pointer pass to print function
 // filter: tag filter allow what tag log would be print
 void ulog_init(print_func func, void *userdata, int filter);
-
-
-// init ulog with default configuration.
-// will log to stdout and a log file in current work directory.
-// app: argv[0] program name, using for log file name. 'app.log.date_time'
-// using filter if ENV var ULOG_LEVEL set Trace/Debug/Info/Warn/Error.
-void ulog_init_default(const char *app);
 
 
 // ulog log process function

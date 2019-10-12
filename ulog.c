@@ -2,10 +2,10 @@
 
 #include <stdio.h>
 #include <stdarg.h>
-#include <time.h>
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
+
+#if ULOG_ENABLE_TIME
+# include <time.h>
+#endif
 
 // ulog default print function
 static int ulog_default_print(void* userdata, int tag, const char* line);
@@ -49,6 +49,9 @@ void ulog_log(int tag, const char *file, int lineno, const char *func, const cha
         return;
     }
 
+    int idx = 0;
+    char line[ULOG_LINE_MAXCHAR];
+
 #if ULOG_ENABLE_ADDR
     // get file name from file path
     for (const char* p = file; *p; p++) {
@@ -57,15 +60,13 @@ void ulog_log(int tag, const char *file, int lineno, const char *func, const cha
         }
     }
 #endif // ULOG_ENABLE_ADDR
+
+#if ULOG_ENABLE_TIME
+    // prcess timestamp, tag name, address, function
     // get timestamp
     struct timespec now;
     clock_gettime(CLOCK_REALTIME, &now);
     struct tm *tminfo = localtime(&now.tv_sec);
-
-    int idx = 0;
-    char line[ULOG_LINE_MAXCHAR];
-    // prcess timestamp, tag name, address, function
-#if ULOG_ENABLE_TIME
 # if ULOG_ENABLE_DATE
     idx += strftime(line + idx, sizeof(line) - idx, "%F %T", tminfo);
 # else
@@ -124,61 +125,5 @@ void ulog_init(print_func func, void *userdata, int filter)
     m_print = func ? func : ulog_default_print;
     m_userdata = userdata;
     m_filter = filter;
-}
-
-static int ulog_default_log(void *userdata, int tag, const char *line)
-{
-    int rc = printf("%s", line);
-    if (userdata) {
-        FILE *fp = userdata;
-        fputs(line, fp);
-        fflush(fp);
-    }
-    return rc;
-}
-
-void ulog_init_default(const char *app)
-{
-    int lv = ULOG_LV_ALL;
-    char *env = getenv("ULOG_LEVEL");
-    if (env) {
-        if (strcasecmp(env, "Trace") == 0) {
-            lv = ULOG_LV_TRACE;
-        } else if (strcasecmp(env, "Debug") == 0) {
-            lv = ULOG_LV_DEBUG;
-        } else if (strcasecmp(env, "Info") == 0) {
-            lv = ULOG_LV_INFO;
-        } else if (strcasecmp(env, "Warn") == 0) {
-            lv = ULOG_LV_WARN;
-        } else if (strcasecmp(env, "Error") == 0) {
-            lv = ULOG_LV_ERROR;
-        } else {
-            LOG_WARN("invalid ulog ENV '%s' = '%s', using default",
-                     "ULOG_LEVEL", env);
-            env = "Trace";
-        }
-        LOG_INFO("ulog level=%s", env);
-    }
-
-    for (const char *p = app; *p; p++) {
-        if (*p == '/' || *p == '\\') {
-            app = p + 1;
-        }
-    }
-    time_t now = time(NULL);
-    char tim[32];
-    strftime(tim, sizeof(tim), "%y%m%d_%H%M", localtime(&now));
-
-    char buf[64];
-    snprintf(buf, sizeof(buf), "%s.log.%s", app, tim);
-
-    FILE* logf = fopen(buf, "w");
-    if (logf) {
-        ulog_init(ulog_default_log, logf, lv);
-        LOG_INFO("ulog create log file '%s' OK", buf);
-    } else {
-        LOG_WARN("ulog create log file '%s' FAILED, %s", buf, strerror(errno));
-        ulog_init(NULL, NULL, lv);
-    }
 }
 
