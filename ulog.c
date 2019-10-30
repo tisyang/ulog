@@ -61,6 +61,7 @@ void ulog_log(int tag, const char *file, int lineno, const char *func, const cha
     }
 #endif // ULOG_ENABLE_ADDR
 
+
 #if ULOG_ENABLE_TIME
     // prcess timestamp, tag name, address, function
     // get timestamp
@@ -68,9 +69,9 @@ void ulog_log(int tag, const char *file, int lineno, const char *func, const cha
     clock_gettime(CLOCK_REALTIME, &now);
     struct tm *tminfo = localtime(&now.tv_sec);
 # if ULOG_ENABLE_DATE
-    idx += strftime(line + idx, sizeof(line) - idx, "%F %T", tminfo);
+    idx += strftime(line + idx, sizeof(line) - idx, "%Y-%m-%d %H:%M:%S", tminfo);
 # else
-    idx += strftime(line + idx, sizeof(line) - idx, "%T", tminfo);
+    idx += strftime(line + idx, sizeof(line) - idx, "%H:%M:%S", tminfo);
 # endif
 # if ULOG_ENABLE_MILLISECOND
     idx += snprintf(line + idx, sizeof(line) - idx, ".%03d", now.tv_nsec / 1000000L);
