@@ -1,3 +1,4 @@
+set(ULOG_LINE_MAXCHAR 512 CACHE STRING "Max bytes in one log line including terminating null byte")
 option(ULOG_ENABLE_TIMESTAMP "Enable timestamp in log" ON)
 option(ULOG_ENABLE_DATE "Enable date in log timestamp" OFF)
 option(ULOG_ENABLE_MILLISECOND "Enable millisecond in log timestamp" ON)
@@ -5,7 +6,7 @@ option(ULOG_ENABLE_COLOR "Enable terminal color in log" ON)
 option(ULOG_ENABLE_ADDRESS "Enable file name and line number in log" ON)
 option(ULOG_ENABLE_FUNCTION "Enable function name in log" OFF)
 
-
+add_definitions(-DULOG_LINE_MAXCHAR=${ULOG_LINE_MAXCHAR})
 if (NOT ULOG_ENABLE_TIMESTAMP)
     add_definitions(-DULOG_DISABLE_TIME)
 endif()

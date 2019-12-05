@@ -11,7 +11,9 @@ extern "C" {
 
 // configuration macros
 // max chars in one line, including terminal null char
-#define ULOG_LINE_MAXCHAR   512
+#ifndef ULOG_LINE_MAXCHAR
+# define ULOG_LINE_MAXCHAR   512
+#endif
 
 // enable color by default
 #ifndef ULOG_DISABLE_COLOR
