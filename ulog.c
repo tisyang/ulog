@@ -39,6 +39,7 @@ static const char* const TAG_COLORS[] = {
 };
 #define COLOR_ADDR  "\x1b[90m"
 #define COLOR_FUNC  COLOR_ADDR
+#define COLOR_TIME  "\x1b[95m"
 #define COLOR_RESET "\x1b[0m"
 
 
@@ -68,6 +69,9 @@ void ulog_log(int tag, const char *file, int lineno, const char *func, const cha
     struct timespec now;
     clock_gettime(CLOCK_REALTIME, &now);
     struct tm *tminfo = localtime(&now.tv_sec);
+# if ULOG_ENABLE_COLOR
+    idx += snprintf(line + idx, sizeof(line) - idx, "%s", COLOR_TIME);
+# endif
 # if ULOG_ENABLE_DATE
     idx += strftime(line + idx, sizeof(line) - idx, "%Y-%m-%d %H:%M:%S", tminfo);
 # else
