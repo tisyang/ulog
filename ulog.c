@@ -39,7 +39,7 @@ static const char* const TAG_COLORS[] = {
 };
 #define COLOR_ADDR  "\x1b[90m"
 #define COLOR_FUNC  COLOR_ADDR
-#define COLOR_TIME  "\x1b[95m"
+#define COLOR_TIME  "\x1b[92m"
 #define COLOR_RESET "\x1b[0m"
 
 
