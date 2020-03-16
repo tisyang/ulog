@@ -85,6 +85,13 @@ void ulog_log(int tag, const char *file, int lineno, const char *func, const cha
 #define	LOG_WARN(...)   ulog_log(ULOG_TAG_WARN,  __FILE__, __LINE__, __func__, __VA_ARGS__)
 #define	LOG_ERROR(...)  ulog_log(ULOG_TAG_ERROR, __FILE__, __LINE__, __func__, __VA_ARGS__)
 
+
+// helper function, like clock_gettime(CLOCK_REALTIME, ...)
+#if ULOG_ENABLE_TIME
+# include <time.h>
+void ulog_gettime(time_t *tv_sec, long *tv_nsec);
+#endif
+
 #ifdef __cplusplus
 }
 #endif

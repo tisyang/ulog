@@ -4,7 +4,25 @@
 #include <stdarg.h>
 
 #if ULOG_ENABLE_TIME
-# include <time.h>
+# ifdef _WIN32
+# include "Windows.h"
+# endif
+
+void ulog_gettime(time_t *tv_sec, long *tv_nsec)
+{
+# ifdef _WIN32
+    __int64 wintime;
+    GetSystemTimeAsFileTime((FILETIME*)&wintime);
+    wintime -= 116444736000000000ll;        //1jan1601 to 1jan1970
+    *tv_sec  = wintime / 10000000ll;        //seconds
+    *tv_nsec = wintime % 10000000ll * 100;  //nano-seconds
+# else
+    struct timespec now;
+    clock_gettime(CLOCK_REALTIME, &now);
+    *tv_sec = now.tv_sec;
+    *tv_nsec = now.tv_nsec;
+# endif
+}
 #endif
 
 // ulog default print function
@@ -66,9 +84,10 @@ void ulog_log(int tag, const char *file, int lineno, const char *func, const cha
 #if ULOG_ENABLE_TIME
     // prcess timestamp, tag name, address, function
     // get timestamp
-    struct timespec now;
-    clock_gettime(CLOCK_REALTIME, &now);
-    struct tm *tminfo = localtime(&now.tv_sec);
+    time_t tv_sec;
+    long tv_nsec;
+    ulog_gettime(&tv_sec, &tv_nsec);
+    struct tm *tminfo = localtime(&tv_sec);
 # if ULOG_ENABLE_COLOR
     idx += snprintf(line + idx, sizeof(line) - idx, "%s", COLOR_TIME);
 # endif
@@ -78,7 +97,7 @@ void ulog_log(int tag, const char *file, int lineno, const char *func, const cha
     idx += strftime(line + idx, sizeof(line) - idx, "%H:%M:%S", tminfo);
 # endif
 # if ULOG_ENABLE_MILLISECOND
-    idx += snprintf(line + idx, sizeof(line) - idx, ".%03d", now.tv_nsec / 1000000L);
+    idx += snprintf(line + idx, sizeof(line) - idx, ".%03d", tv_nsec / 1000000L);
 # endif
 #endif
 
